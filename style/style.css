@@ -1,0 +1,112 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#statistics {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-row-gap: 15%;
+    grid-column-gap: 5%;
+    padding-left: 25%;
+    padding-right: 25%;
+}
+
+@media only screen and (max-width: 600px) {
+    #statistics {
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+  }
+
+.statistic {
+    padding: 10px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, .2);
+    border-radius: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-left: 25px;
+    padding-right: 25px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.statistic:hover {
+    transform: translate(0px, -5px);
+    transition: .3s;
+}
+
+.statistic-labels {
+    display: grid;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.title {
+    margin: 75px;
+    margin-left: 25%;
+    color: #3f3f3f;
+}
+
+#overview-header {
+    margin-top: 100px;
+    margin-left: 25%;
+}
+
+.header {
+    font-style: normal;
+    font-size: 25px;
+}
+
+.descriptor {
+    font-style: italic;
+    font-weight: lighter;
+    font-size: 20px;
+}
+
+.statistic-label {
+    font-weight: lighter;
+    margin: 5px;
+}
+
+.value {
+    font-weight: bold;
+    color: #3f3f3f;
+}
+
+.change {
+    color: green;
+}
+
+.blob-container {
+    position:absolute; 
+	top:0; 
+	left:0; 
+	height:100%; 
+	width:100%; 
+	z-index:-1; 
+}
+
+.blob {
+    position: absolute;
+}
+
+.table {
+    border-collapse: collapse;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, .2);
+    width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+    border-radius: 15px;
+    border-style: hidden;
+}
+
+th, td {
+    border: 1px solid #d3d3d3;
+    padding: 10px;
+    color: #3f3f3f;
+    font-weight: normal;
+}
+
+.table-category {
+    font-weight: bold;
+}
