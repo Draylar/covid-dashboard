@@ -12,23 +12,44 @@ var diff;
 const table = document.getElementById("overview-table");
 const tableBody = table.getElementsByTagName('tbody')[0];
 
+// Some countries have abbreviated names in country population request, this remaps them
+const exchanges = (name) => {
+    if(name == 'USA') {
+        return 'United States of America'
+    }
+
+    return name;
+};
+
 // Saved values
 var historicalCases;
 var historicalDeaths;
 var historicalRecovered;
+var countryPopulations = new Map();
 
 // TODO: CACHE DATA FROM REQUEST
 
-// Retrieve historical values
-fetch('https://corona.lmao.ninja/v2/historical/all')
-    .then(response => response.json())
-    .then(json => {
-        historicalCases = json.cases;
-        historicalDeaths = json.deaths;
-        historicalRecovered = json.recovered;
-
+fetchPopulation(() => {
+    fetchHistorical(() => {
         fetchData();
-    });
+    })
+})
+
+/**
+ * Retrieves and stores historial global covid data from the past month, then runs the given callback.
+ * @param {Function} callback 
+ */
+function fetchHistorical(callback) {
+    fetch('https://corona.lmao.ninja/v2/historical/all')
+        .then(response => response.json())
+        .then(json => {
+            historicalCases = json.cases;
+            historicalDeaths = json.deaths;
+            historicalRecovered = json.recovered;
+
+            callback();
+        });
+}
 
 function fetchData() {
     fetch(`https://api.covid19api.com/summary`)
@@ -69,19 +90,43 @@ function fetchData() {
                 const deathsTotal = createCell(row);
                 const casesPer = createCell(row);
 
+                const activeCases = element.TotalConfirmed - element.TotalDeaths - element.TotalRecovered;
+                const perMillion = (activeCases / countryPopulations.get(element.Country)) * 1000000;
+
                 // Set values
                 country.innerHTML = element.Country;
                 casesToday.innerHTML = element.NewConfirmed;
-                casesActive.innerHTML = element.TotalConfirmed - element.TotalDeaths - element.TotalRecovered;
+                casesActive.innerHTML = activeCases;
                 casesTotal.innerHTML = element.TotalConfirmed;
                 deathsToday.innerHTML = element.NewDeaths;
                 deathsTotal.innerHTML = element.TotalDeaths;
-                casesPer.innerHTML = 0;
+
+                if(perMillion) {
+                    casesPer.innerHTML = parseFloat(perMillion).toFixed(1);
+                } else {
+                    casesPer.innerHTML = "N/A";
+                }
             });
 
             sorttable.makeSortable(table);
             // sort();
             fetchYesterday();
+        });
+}
+
+/**
+ * Fetches pand stores population data for each country, then runs the given callback.
+ * @param {Function} callback 
+ */
+function fetchPopulation(callback) {
+    fetch('https://corona.lmao.ninja/v3/covid-19/countries')
+        .then(response => response.json())
+        .then(response => {
+            response.forEach(countryData => {
+                countryPopulations.set(exchanges(countryData.country), countryData.population);
+            });
+
+            callback();
         });
 }
 
@@ -97,7 +142,7 @@ function fetchYesterday() {
         .then(response => response.json())
         .then(response => {
             response = response[0];
-            
+
             yesterday = {
                 newCases: response.NewConfirmed,
                 newDeaths: response.NewDeaths,
@@ -175,7 +220,7 @@ function setCardChange(card, data) {
         const percentage = data * 100;
         value.innerHTML = new Number(percentage).toFixed(2).toLocaleString() + "%";
 
-        if(percentage < 0) {
+        if (percentage < 0) {
             value.style.color = 'green';
         } else if (percentage < 1) {
             value.style.color = 'orange';
